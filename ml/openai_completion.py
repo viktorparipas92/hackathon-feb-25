@@ -30,3 +30,18 @@ def generate_chat_completion_stream(prompt: str):
                 yield chunk.choices[0].delta.content
     except AuthenticationError:
         return ''
+
+
+def get_chat_completion(prompt: str):
+    openai = _get_openai_client()
+    messages = [{'role': 'user', 'content': prompt}]
+    try:
+        completion = openai.chat.completions.create(
+            messages=messages,
+            model=COMPLETION_MODEL,
+        )
+    except AuthenticationError:
+        return ''
+
+    response = completion.choices[0].message
+    return response.content if not response.refusal else 'No response.'

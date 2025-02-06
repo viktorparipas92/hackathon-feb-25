@@ -1,9 +1,10 @@
 localhost.pem
 localhost-key.pem
-slack/*
+slack/.env
 .idea/*
 __pycache__/*
 test_main.http
 couchbase/footway_cs_dataset.json
 ml/__pycache__/*
 ml/.env
+slack/__pycache__/*
