@@ -40,3 +40,17 @@ def get_im_conversation_history(im_channel_id, limit=5):
         return []
 
     return data.get('messages', [])
+
+
+def download_image(image_url):
+    headers = {
+        'Authorization': f'Bearer {SLACK_BOT_TOKEN}'
+    }
+    response = requests.get(image_url, headers=headers)
+
+    if response.status_code == 200:
+        return response.content
+    else:
+        raise Exception(
+            f"Failed to download image from Slack. Status code: {response.status_code}"
+        )
