@@ -5,3 +5,5 @@ slack/*
 __pycache__/*
 test_main.http
 couchbase/footway_cs_dataset.json
+ml/__pycache__/*
+ml/.env
