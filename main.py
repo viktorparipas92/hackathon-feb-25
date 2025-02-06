@@ -36,20 +36,22 @@ async def chat(request: Request):
         return {'ok': True}
 
     event = data['event']
-    if is_sent_by_bot(event):
+    if not should_respond(event):
+        print('Sent by bot')
         return {'ok': True}
+    else:
+        print('Not sent by bot')
+        print(list(event.keys()))
+        print('Event', event)
+
 
     im_channel_id = event.get('channel')
     image_interpretations = []
-    print('Files', event.get('files'))
     if files := event.get('files'):
-        print(files)
-
         for file in files:
             image_data = download_image(file.get('url_private_download'))
             if image_data:
                 encoded_image = encode_image(image_data)
-                print('Encoded image')
                 interpretation = get_image_interpretation(
                     prompt='What is this image about?',
                     base64_image=encoded_image,
@@ -65,12 +67,9 @@ async def chat(request: Request):
 
     conversation_history = get_im_conversation_history(im_channel_id, limit=5)
     text = event.get('text')
-    print('Original text', text)
     if image_interpretations:
-        print()
         text += 'The following are the interpretations of the attached images'
         text += '\n'.join(ii['interpretation'] for ii in image_interpretations)
-        print('Augmented text', text)
 
     messages = format_messages_for_openai(conversation_history, text)
     response = get_chat_completion(messages)
@@ -79,8 +78,12 @@ async def chat(request: Request):
     return Response(status_code=200)
 
 
-def is_sent_by_bot(event: dict):
-    return 'bot_id' in event
+def should_respond(event: dict):
+    return (
+        not 'bot_profile' in dict(event)
+        # and event.get('type', '') == 'message'
+        # and not event.get('subtype') ==
+    )
 
 
 def encode_image(image_data):
