@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, Request
 from starlette.responses import StreamingResponse
 
 from ml.openai_completion import generate_chat_completion_stream
@@ -16,3 +16,12 @@ async def root(
     response: str = generate_chat_completion_stream(text)
 
     return StreamingResponse(response, media_type='text/plain')
+
+
+@app.post('/chat/')
+async def chat(request: Request):
+    data = await request.json()
+    if 'challenge' in data:
+        return {'challenge': data['challenge']}
+
+    return {'message': 'Hello, World!'}
