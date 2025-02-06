@@ -32,9 +32,8 @@ def generate_chat_completion_stream(prompt: str):
         return ''
 
 
-def get_chat_completion(prompt: str):
+def get_chat_completion(messages: list):
     openai = _get_openai_client()
-    messages = [{'role': 'user', 'content': prompt}]
     try:
         completion = openai.chat.completions.create(
             messages=messages,

@@ -1,13 +1,12 @@
-import redis as redis
 from fastapi import FastAPI, Form, Request, Response
 from starlette.responses import StreamingResponse
 
 from ml.openai_completion import generate_chat_completion_stream, get_chat_completion
-from slack.send_message import send_message
+from slack.format import format_messages_for_openai
+from slack.requests import send_message, get_im_conversation_history
 
 app = FastAPI()
 
-redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 @app.post('/')
 async def root(
@@ -36,19 +35,14 @@ async def chat(request: Request):
         print('Bot message')
         return {'ok': True}
 
-    user_id = event.get('user')
+    im_channel_id = event.get('channel')
+    conversation_history = get_im_conversation_history(im_channel_id, limit=5)
+
     text = event.get('text')
-    channel_id = event.get('channel')
-
-    conversation_context = redis_client.get(f'conversation:{user_id}') or ''
-    # openai_response = generate_chat_completion_stream(conversation_context + text)
-    openai_response = get_chat_completion(conversation_context + text)
-
-    new_conversation_context = f'{conversation_context}{text}\n{openai_response}\n'
-    redis_client.set(f'conversation:{user_id}', new_conversation_context)
-
-    send_message(channel_id, openai_response)
-
+    messages = format_messages_for_openai(conversation_history, text)
+    print('Messages:', messages)
+    openai_response = get_chat_completion(messages)
+    send_message(im_channel_id, openai_response)
     return Response(status_code=200)
 
 
