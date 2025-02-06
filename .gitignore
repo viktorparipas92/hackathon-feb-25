@@ -1,0 +1,6 @@
+localhost.pem
+localhost-key.pem
+slack/*
+.idea/*
+__pycache__/*
+test_main.http
