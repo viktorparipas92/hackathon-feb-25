@@ -43,6 +43,7 @@ def get_chat_completion(messages: list):
         completion = openai.chat.completions.create(
             messages=messages,
             model=COMPLETION_MODEL,
+            max_completion_tokens=300,
         )
     except AuthenticationError:
         return ''

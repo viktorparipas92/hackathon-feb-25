@@ -40,14 +40,13 @@ async def chat(request: Request):
         print('Sent by bot')
         return {'ok': True}
     else:
-        print('Not sent by bot')
-        print(list(event.keys()))
-        print('Event', event)
-
+        print(f'Not sent by bot: {event["type"]}')
+        print(event)
 
     im_channel_id = event.get('channel')
     image_interpretations = []
     if files := event.get('files'):
+        print(event['type'])
         for file in files:
             image_data = download_image(file.get('url_private_download'))
             if image_data:
@@ -65,7 +64,11 @@ async def chat(request: Request):
                     }
                 )
 
+    if not im_channel_id:
+        return Response(status_code=200)
+
     conversation_history = get_im_conversation_history(im_channel_id, limit=5)
+
     text = event.get('text')
     if image_interpretations:
         text += 'The following are the interpretations of the attached images'
@@ -81,7 +84,7 @@ async def chat(request: Request):
 def should_respond(event: dict):
     return (
         not 'bot_profile' in dict(event)
-        # and event.get('type', '') == 'message'
+        and event.get('type', '') == 'message'
         # and not event.get('subtype') ==
     )
 

@@ -9,5 +9,8 @@ def format_messages_for_openai(conversation_history, user_message):
         }
         for message in reversed(conversation_history)
     ]
-    messages.append({'role': 'user', 'content': user_message})
+    messages.append({
+        'role': 'user',
+        'content': f'Please answer briefly: {user_message}'
+    })
     return messages
