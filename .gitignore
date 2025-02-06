@@ -4,3 +4,4 @@ slack/*
 .idea/*
 __pycache__/*
 test_main.http
+couchbase/footway_cs_dataset.json
