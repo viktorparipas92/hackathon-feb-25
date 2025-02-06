@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Support AI Hackathon With AWS, Couchbase And Cillers</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    form {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    input[type="file"] {
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 15px;
+      font-size: 1em;
+    }
+    #output {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chat Interface</h1>
+  <form id="chatForm">
+    <label for="textInput">Enter your message (if no image is provided):</label>
+    <textarea id="textInput" rows="4" placeholder="Type your question here..."></textarea>
+    
+    <label for="imageInput">Or upload an image:</label>
+    <input type="file" id="imageInput" accept="image/*">
+    
+    <button type="submit">Send</button>
+  </form>
+  
+  <div id="output"></div>
+  
+  <script>
+document.getElementById("chatForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+  
+  const textInput = document.getElementById("textInput").value.trim();
+  const imageInput = document.getElementById("imageInput").files[0];
+  const outputDiv = document.getElementById("output");
+  const endpoint = "/chat";  // Adjust the endpoint URL as needed
+  
+  // If an image file is provided, use the image-processing function
+  if (imageInput) {
+    const formData = new FormData();
+    formData.append("image", imageInput);
+    // Optionally send text input as additional context
+    formData.append("text", textInput);
+    
+    fetch(endpoint, {
+      method: "POST",
+      body: formData
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      outputDiv.innerText = data.response;
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      outputDiv.innerText = "Error: " + error;
+    });
+  } 
+  // Otherwise, if text is provided, use the text function
+  else if (textInput) {
+    fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ text: textInput })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      outputDiv.innerText = data.response;
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      outputDiv.innerText = "Error: " + error;
+    });
+  } else {
+    outputDiv.innerText = "Please provide a text message or upload an image.";
+  }
+});
+  </script>
+</body>
+</html>

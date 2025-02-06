@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Support AI Hackathon - Image Processing</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    form {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 15px;
+      font-size: 1em;
+    }
+    #output {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Multi-modal Interface</h1>
+  <form id="imageForm">
+    <label for="imageInput">Upload an image:</label>
+    <input type="file" id="imageInput" accept="image/*">
+    
+    <button type="submit">Send</button>
+  </form>
+  
+  <div id="output"></div>
+  
+  <script>
+document.getElementById("imageForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+  
+  const imageInput = document.getElementById("imageInput").files[0];
+  const outputDiv = document.getElementById("output");
+  const endpoint = "/process_image";  // Adjust the endpoint URL as needed
+  
+  if (imageInput) {
+    const formData = new FormData();
+    formData.append("image", imageInput);
+    
+    fetch(endpoint, {
+      method: "POST",
+      body: formData
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      outputDiv.innerText = data.response;
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      outputDiv.innerText = "Error: " + error;
+    });
+  } else {
+    outputDiv.innerText = "Please upload an image.";
+  }
+});
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+conda create -n  couchbase_aws python=3.9
+conda activate couchbase_aws
+pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu113 transformers accelerate
+pip install transformers==4.39.3
+pip install sentencepiece
+pip install langchain-couchbase couchbase

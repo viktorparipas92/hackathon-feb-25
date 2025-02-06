@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Support AI Hackathon - Text Processing</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    form {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 15px;
+      font-size: 1em;
+    }
+    #output {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Text Based Interface</h1>
+  <form id="textForm">
+    <label for="textInput">Enter your message:</label>
+    <textarea id="textInput" rows="4" placeholder="Type your question here..."></textarea>
+    
+    <button type="submit">Send</button>
+  </form>
+  
+  <div id="output"></div>
+  
+  <script>
+document.getElementById("textForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+  
+  const textInput = document.getElementById("textInput").value.trim();
+  const outputDiv = document.getElementById("output");
+  const endpoint = "/process_text";  // Adjust the endpoint URL as needed
+  
+  if (textInput) {
+    fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ text: textInput })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      outputDiv.innerText = data.response;
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      outputDiv.innerText = "Error: " + error;
+    });
+  } else {
+    outputDiv.innerText = "Please enter a message.";
+  }
+});
+  </script>
+</body>
+</html>
