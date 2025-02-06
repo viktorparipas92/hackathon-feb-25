@@ -14,7 +14,6 @@ async def root(
     user_name: str = Form(...),
     text: str = Form(...)
 ):
-    # response_message = f'@{user_name} used {command} with args: {text}'
     response: str = generate_chat_completion_stream(text)
 
     return StreamingResponse(response, media_type='text/plain')
@@ -32,17 +31,19 @@ async def chat(request: Request):
     event = data['event']
     print('Event:', event)
     if is_sent_by_bot(event):
-        print('Bot message')
         return {'ok': True}
 
     im_channel_id = event.get('channel')
-    conversation_history = get_im_conversation_history(im_channel_id, limit=5)
+    if files := event.get('files'):
+        filenames = [file['name'] for file in files]
+        response = f'You attached these files: {filenames}'
+    else:
+        conversation_history = get_im_conversation_history(im_channel_id, limit=5)
+        text = event.get('text')
+        messages = format_messages_for_openai(conversation_history, text)
+        response = get_chat_completion(messages)
 
-    text = event.get('text')
-    messages = format_messages_for_openai(conversation_history, text)
-    print('Messages:', messages)
-    openai_response = get_chat_completion(messages)
-    send_message(im_channel_id, openai_response)
+    send_message(im_channel_id, response)
     return Response(status_code=200)
 
 
